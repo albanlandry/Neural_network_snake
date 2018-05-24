@@ -1,6 +1,5 @@
 import pygame
 import time
-import threading
 from random import randint
 
 ' Classes responsible for drawing elements on the surface'
@@ -73,6 +72,11 @@ class Labyrinth(Drawer):
 
 class Snake(Drawer):
 	'Player class'
+	DIRECTION_UP = 0
+	DIRECTION_DOWN = 1
+	DIRECTION_LEFT = 2
+	DIRECTION_RIGHT = 3
+	
 	def __init__(self, length = 3, step = 10):
 		self.step = step
 		self.x = []
@@ -85,16 +89,16 @@ class Snake(Drawer):
 			self.y.append(self.DEFAULT_WIDTH)
 	
 	def move_up(self, step):
-		self.direction = 0
+		self.direction = self.DIRECTION_UP
 		
 	def move_down(self, step):
-		self.direction = 1
+		self.direction = self.DIRECTION_DOWN
 		
 	def move_left(self, step):
-		self.direction = 2
+		self.direction = self.DIRECTION_LEFT
 		
 	def move_right(self, step):
-		self.direction = 3
+		self.direction = self.DIRECTION_RIGHT
 		
 	def update(self):
 		previousX = self.x[0]
@@ -136,7 +140,7 @@ class Food(Drawer):
 		pygame.draw.rect(surface, (0, 0, 250), pygame.Rect(self.x, self.y, self.DEFAULT_WIDTH, self.DEFAULT_HEIGHT)) 
 
 class GameLogic:
-	def isCollision(self,x1,y1,x2,y2,bsize):
+	def isCollision(self,x1,y1,x2,y2, bsize = 0):
 		if x1 == x2 and y1==y2:
 			return True
 		return False
@@ -145,6 +149,8 @@ class SnakeGame:
 	gameName = "Neural Network SNAKE"
 	step = 10
 	speed = 150.0/1000.0
+	WIDTH = 400
+	HEIGHT = 500
 
 	def __init__(self):
 		self.isRunning = False #Used for the main loop
@@ -152,7 +158,7 @@ class SnakeGame:
 		self.player = Snake()
 		self.food = None
 		self.gameDisplay = None
-		self.size = self.weight, self.height = 400, 400
+		self.size = self.WIDTH, self.HEIGHT
 		self.labyrinth = None
 		self.time = pygame.time.Clock()
 		self.game = None
@@ -209,10 +215,10 @@ class SnakeGame:
 		
 	def on_loop(self):
 		# Check whether the snake reaches the boundaries
-		if self.player.x[0] == self.labyrinth.width * self.player.DEFAULT_WIDTH:
+		if (self.player.x[0] == (self.labyrinth.width - 1) * self.player.DEFAULT_WIDTH) and self.player.direction == self.player.DIRECTION_RIGHT:
 			self.player.x[0] = 0
 			
-		if self.player.y[0] == self.labyrinth.height * self.player.DEFAULT_HEIGHT:
+		if (self.player.y[0] == (self.labyrinth.height - 1) * self.player.DEFAULT_HEIGHT) and self.player.direction == self.player.DIRECTION_DOWN:
 			self.player.y[0] = 0
 			
 		if self.player.x[0] < 0:
@@ -226,14 +232,15 @@ class SnakeGame:
 		
 		# Detect if the snake eat the food
 		for i in range(0,self.player.length):
-			if self.gameLogic.isCollision(self.food.x,self.food.y,self.player.x[i], self.player.y[i], 10):
+			if self.gameLogic.isCollision(self.food.x,self.food.y,self.player.x[i], self.player.y[i]):
 				self.food.x = randint(1,self.labyrinth.width - 2) * 10
 				self.food.y = randint(1,self.labyrinth.width - 2) * 10
 				self.player.grow()
-		
+
 		# Detect whether the snake eats himself
-		# if self.player.x[0] in 
-		pass
+		for i in range(1, self.player.length):
+			if self.gameLogic.isCollision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i]):
+				self.isStarted = False
 		
 	def on_render(self):
 		self.gameDisplay.fill((255, 255, 255))
