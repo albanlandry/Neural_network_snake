@@ -208,6 +208,20 @@ class SnakeGame:
 		self.on_cleanup()
 		
 	def on_loop(self):
+		# Check whether the snake reaches the boundaries
+		if self.player.x[0] == self.labyrinth.width * self.player.DEFAULT_WIDTH:
+			self.player.x[0] = 0
+			
+		if self.player.y[0] == self.labyrinth.height * self.player.DEFAULT_HEIGHT:
+			self.player.y[0] = 0
+			
+		if self.player.x[0] < 0:
+			self.player.x[0] = (self.labyrinth.width - 1) * self.player.DEFAULT_WIDTH
+			
+		if self.player.y[0] < 0:
+			self.player.y[0] = (self.labyrinth.height - 1) * self.player.DEFAULT_HEIGHT
+		
+		# Update snake position 
 		self.player.update()
 		
 		# Detect if the snake eat the food
@@ -218,7 +232,7 @@ class SnakeGame:
 				self.player.grow()
 		
 		# Detect whether the snake eats himself
-		if self.player.x[0] in 
+		# if self.player.x[0] in 
 		pass
 		
 	def on_render(self):
