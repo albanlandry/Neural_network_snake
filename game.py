@@ -12,8 +12,6 @@ class Drawer:
 ''' Game Elements '''
 class Labyrinth(Drawer):
 	'Labyrinth use inside the game'
-	height = 40
-	width = 40
 	DEFAULT_PATTERN = [
 					  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 					  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -63,12 +61,14 @@ class Labyrinth(Drawer):
 	''' 
 	def __init__(self, pattern = []):
 		self.pattern = pattern
+		self.height = len(pattern)
+		self.width = len(pattern[0])
 		
 	def draw(self, surface):
 		for i in range(0, len(self.pattern)):
 			for j in range(0, len(self.pattern[i])):
 				if self.pattern[i][j] == 1:
-					pygame.draw.rect(surface, (50, 50, 50), pygame.Rect(j * self.DEFAULT_HEIGHT, i * self.DEFAULT_HEIGHT, self.DEFAULT_HEIGHT, self.DEFAULT_WIDTH))
+					pygame.draw.rect(surface, (150, 150, 150), pygame.Rect(j * self.DEFAULT_HEIGHT, i * self.DEFAULT_HEIGHT, self.DEFAULT_HEIGHT, self.DEFAULT_WIDTH))
 
 class Snake(Drawer):
 	'Player class'
@@ -127,7 +127,9 @@ class Snake(Drawer):
 		self.length += 1
 			
 	def draw(self, surface):
-		for i in range(0, self.length):
+		pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(self.x[0], self.y[0], 10, 10)) 
+		
+		for i in range(1, self.length):
 			pygame.draw.rect(surface, (255, 0, 0), pygame.Rect(self.x[i], self.y[i], 10, 10)) 
 
 class Food(Drawer):
@@ -214,6 +216,17 @@ class SnakeGame:
 		self.on_cleanup()
 		
 	def on_loop(self):
+		# Check whether the snake collides with the labyrinth's block
+		player_x = self.player.x[0] // self.player.DEFAULT_WIDTH 
+		player_y = self.player.y[0] // self.player.DEFAULT_HEIGHT
+		
+		if player_x >= 0 and player_y >= 0:# is the index not negative
+			if self.labyrinth.pattern[player_x][player_y] == 1:
+				print("Collision detected")
+			
+		
+		# print("index x0 = %d, index y0 = %d" % (player_x, player_y))
+		
 		# Check whether the snake reaches the boundaries
 		if (self.player.x[0] == (self.labyrinth.width - 1) * self.player.DEFAULT_WIDTH) and self.player.direction == self.player.DIRECTION_RIGHT:
 			self.player.x[0] = 0
@@ -225,7 +238,7 @@ class SnakeGame:
 			self.player.x[0] = (self.labyrinth.width - 1) * self.player.DEFAULT_WIDTH
 			
 		if self.player.y[0] < 0:
-			self.player.y[0] = (self.labyrinth.height - 1) * self.player.DEFAULT_HEIGHT
+			self.player.y[0] = (self.labyrinth.height -1) * self.player.DEFAULT_HEIGHT
 		
 		# Update snake position 
 		self.player.update()
@@ -237,7 +250,7 @@ class SnakeGame:
 				self.food.y = randint(1,self.labyrinth.width - 2) * 10
 				self.player.grow()
 
-		# Detect whether the snake eats himself
+		# Detect whether the snake collides with himself
 		for i in range(1, self.player.length):
 			if self.gameLogic.isCollision(self.player.x[0], self.player.y[0], self.player.x[i], self.player.y[i]):
 				self.isStarted = False
