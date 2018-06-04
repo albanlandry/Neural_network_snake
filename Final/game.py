@@ -396,46 +396,11 @@ class SnakeGame():
 		directions.append(labyrinth[player_y, player_x+1]) # right block
 
 		return directions
-		# Retrieve the occupied positions
-		
-		for i in range(1, snake.length-1):
-			player_x = snake.x[i] // snake.DEFAULT_WIDTH 
-			player_y = snake.y[i] // snake.DEFAULT_HEIGHT
-			
-			labyrinth[player_y, player_x] = 1
-		
-		directions = []
-		player_x = snake.x[0] // snake.DEFAULT_WIDTH 
-		player_y = snake.y[0] // snake.DEFAULT_HEIGHT
-				
-		if player_x < 39 and player_y < 39:
-			if snake.direction == 0: # the snake goes up
-				directions.append(labyrinth[player_y, player_x-1]) # left block
-				directions.append(labyrinth[player_y-1, player_x]) # front block
-				directions.append(labyrinth[player_y, player_x+1]) # right block
-			elif snake.direction == 1: # the snake goes down
-				directions.append(labyrinth[player_y, player_x+1]) # left block
-				directions.append(labyrinth[player_y+1, player_x]) # front block
-				directions.append(labyrinth[player_y, player_x-1]) # right block
-			elif snake.direction == 2: # the snake goes left
-				directions.append(labyrinth[player_y+1, player_x]) # left block
-				directions.append(labyrinth[player_y, player_x-1]) # front block
-				directions.append(labyrinth[player_y-1, player_x]) # right block
-			else:# The snake goes right
-				directions.append(labyrinth[player_y-1, player_x]) # left block
-				directions.append(labyrinth[player_y, player_x+1]) # front block
-				directions.append(labyrinth[player_y+1, player_x]) # right block		
-		
-		return directions
 		
 	def compute_angle(self, snake, food):
 		if(snake.direction == 2 or snake.direction == 3):
 			return math.degrees(math.atan2(- food.y + snake.y[0], food.x - snake.x[0]))
 		return math.degrees(math.atan2(food.x - snake.x[0], food.y - snake.y[0]))
-
-	def get_distance_from_food(self, snake, food):
-		vector = np.array([food.x - snake.x[0], food.y - snake.y[0] ])
-		return np.linalg.norm(vector)
 	
 	def build_model(self):
 		# The model
