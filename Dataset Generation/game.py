@@ -4,8 +4,6 @@ from random import randint
 import numpy as np
 import csv
 import math
-from keras.models import Sequential
-from keras.layers import Dense, Activation
 
 ' Classes responsible for drawing elements on the surface'
 class Drawer:
@@ -264,6 +262,7 @@ class SnakeGame():
 			self.input_data.append(self.food.y / 380)
 			self.input_data.append(self.player.x[0] / 380)
 			self.input_data.append(self.player.y[0] / 380)
+			
 			# Automatic action selection
 			action = self.get_suggested_direction(angle, self.player, self.food, board_state)
 			# self.get_action(action)
@@ -271,9 +270,7 @@ class SnakeGame():
 			self.player.direction = action
 			# Adding the action to the inputs
 			self.input_data.append(action)
-			# previousDis = self.get_distance_from_food(self.player, self.food)
-			# print(self.player.x[0], self.player.y[0])
-			# print(angle)
+			
 			# Update snake position 
 			self.player.update()
 			
@@ -285,7 +282,6 @@ class SnakeGame():
 			# if the player is Alive he maybe able to eat
 			if self.player.isAlive:
 				# Detect if the snake eat the food
-				self.input_data.append(1)
 				for i in range(0,self.player.length):
 					if self.gameLogic.isCollision(self.food.x,self.food.y,self.player.x[i], self.player.y[i], 10):
 						self.score_point += 1
@@ -300,15 +296,15 @@ class SnakeGame():
 						self.food.x, self.food.y = food_x * self.player.DEFAULT_WIDTH, food_y * self.player.DEFAULT_HEIGHT
 						self.player.grow()
 			else:
-				self.input_data.append(-1)
 				self.on_reset()
 				self.count -=1
 				
 			print(self.input_data)
-			self.write_in_file("test_data.csv", self.input_data)
+			self.write_in_file("dataset.csv", self.input_data)
 			self.records +=1
 			print ("Records : %d" % self.records)
 			print("Remaining games: %d " % self.count)
+			
 	def on_render(self):
 		self.gameDisplay.fill((255, 255, 255))
 		
@@ -361,10 +357,6 @@ class SnakeGame():
 	def start_pause(self):
 		self.isStarted = not self.isStarted
 		
-	def generate_action(self):
-		action = randint(0,5)
-		return action
-
 	def get_board_state(self, snake, labyrinth):
 		# Retrieve the occupied positions
 		
@@ -430,62 +422,6 @@ class SnakeGame():
 
 		return direction
 	
-	def get_distance_from_food(self, snake, food):
-		vector = np.array([food.x - snake.x[0], food.y - snake.y[0] ])
-		return np.linalg.norm(vector)
-	
-	def build_model(self):
-		# The model
-		model = Sequential()
-		model.add(Dense(7, input_dim=7, activation='relu'))
-		model.add(Dense(20, activation='relu'))
-		model.add(Dense(1, activation='sigmoid'))
-		
-		return model
-		
-	def train(self, model):
-		np.random.seed(123)
-		dataset = np.loadtxt("dataset.csv", delimiter=",")
-		X = dataset[:,0:6]
-		Y = dataset[:,6]
-		# Compile model#
-		model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-		# Fit the model
-		model.fit(X, Y, epochs=100, batch_size=20)
-		
-		return model
-	
-	def test_model(self, model):
-		# evaluate the model
-		test_dataset = np.loadtxt("test_data.csv", delimiter=",")
-		TEST_X = test_dataset[:,0:6]
-		TEST_Y = test_dataset[:,6]
-		
-		#Predict
-		PREDICTED_Y = model.predict_classes(TEST_X)
-		
-		for i in range(len(TEST_X)):
-			print("X=%s, Predicted=%s" % (TEST_X[i], PREDICTED_Y[i]))
-		
-		# evaluate the model
-		scores = model.evaluate(TEST_X, TEST_Y)
-		print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-		
-	def predict(self, input, model):
-		y = model.predict_classes(input)
-		
-		if int(y[0, 0]) == 1:
-			return True
-		# print(input, int(y[0, 0]))
-		return False
-		
-	'Learning API'
-	def learn(self):
-		model = self.build_model()
-		model = self.t  in(model)
-
-		return model
-		# self.test_model(model)
 if __name__ == "__main__" :
 	app = SnakeGame()
 	app.on_execute()
