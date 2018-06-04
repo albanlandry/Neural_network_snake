@@ -1,0 +1,15 @@
+Up, Down, Left, Right : [0 : no obstacle, 1 : Obstacle]
+
+Angle: Angle between the snake head and the food {-1 ~ 1}
+  - if current Direction is UP or Down and the angle positive, then the food is on the right of the snake. if angle is negative, 
+  then the food is on the left of the snake
+  
+  - if current Direction is LEFT or RIGHT and the angle positive, then the food is above the snake. if angle is negative, then the food is 
+  below the snake
+
+Current Direction : [0 : Up , 1 : Down, 2 : Left, 3 : Right]
+
+Food.x, Food.y : Position of the food {0 ~ 380}
+
+Snake.x, Snake.y : Position of the head of the snake – {0 ~ 380}
+
